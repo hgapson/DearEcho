@@ -1,190 +1,180 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import { Button } from "./ui/button";
-import { Card, CardContent } from "./ui/card";
-import { Textarea } from "./ui/textarea";
-import { ArrowLeft, MoreHorizontal, CheckCircle } from "lucide-react";
-import { toast } from "sonner@2.0.3";
-import { Letter, User as UserType } from "../App";
+import { useState } from 'react'
+import { Button } from './ui/button'
+import { Card, CardContent } from './ui/card'
+import { Textarea } from './ui/textarea'
+import { ArrowLeft, MoreHorizontal, CheckCircle } from 'lucide-react'
+import { toast } from 'sonner'
+
+// types
+import type { Letter, User as UserType, MoodType } from '../types'
 
 interface LetterWriterProps {
-  user: UserType | null;
-  onSaveLetter: (letter: Letter) => void;
+  user: UserType | null
+  onSaveLetter: (letter: Letter) => void
 }
 
-type MoodType = 'happy' | 'sad' | 'angry' | 'anxious';
-type Step = 'mood' | 'prompt' | 'writing' | 'journal';
+type Step = 'mood' | 'prompt' | 'writing' | 'journal'
 
 interface MoodOption {
-  id: MoodType;
-  emoji: string;
-  label: string;
-  color: string;
-  bgColor: string;
+  id: MoodType
+  emoji: string
+  label: string
+  color: string
+  bgColor: string
+}
+
+const MOOD_META: Record<MoodType, { emoji: string; color: string; label: string }> = {
+  happy:   { emoji: '😊', color: 'text-yellow-600', label: 'Happy' },
+  sad:     { emoji: '😢', color: 'text-blue-600',   label: 'Sad' },
+  angry:   { emoji: '😠', color: 'text-red-600',    label: 'Angry' },
+  anxious: { emoji: '😰', color: 'text-purple-600', label: 'Anxious' },
+  lonely:  { emoji: '😔', color: 'text-gray-600',   label: 'Lonely' },
 }
 
 export function LetterWriter({ user, onSaveLetter }: LetterWriterProps) {
-  const [currentStep, setCurrentStep] = useState<Step>('mood');
-  const [selectedMood, setSelectedMood] = useState<MoodType | null>(null);
-  const [letterContent, setLetterContent] = useState("");
-  const [isWriting, setIsWriting] = useState(false);
+  const [currentStep, setCurrentStep] = useState<Step>('mood')
+  const [selectedMood, setSelectedMood] = useState<MoodType | null>(null)
+  const [letterContent, setLetterContent] = useState('')
+  const [, setIsWriting] = useState(false) // only need setter
 
-  // Mock previous letters for demo
+  // Demo previous letters
   const [previousLetters] = useState<Letter[]>([
     {
-      id: "1",
-      title: "Happy",
-      content: "Dear Younger Me, you are amazing!",
-      recipient: "younger",
-      mood: "happy",
-      date: "2024-05-03T10:00:00Z",
-      isPrivate: true
+      id: '1',
+      title: 'Happy',
+      content: 'Dear Younger Me, you are amazing!',
+      recipient: 'younger',
+      mood: 'happy',
+      date: '2024-05-03T10:00:00Z',
+      isPrivate: true,
     },
     {
-      id: "2",
-      title: "Lonely",
-      content: "I know it feels lonely sometimes...",
-      recipient: "younger", 
-      mood: "lonely",
-      date: "2024-04-17T14:30:00Z",
-      isPrivate: true
+      id: '2',
+      title: 'Lonely',
+      content: 'I know it feels lonely sometimes...',
+      recipient: 'younger',
+      mood: 'lonely',
+      date: '2024-04-17T14:30:00Z',
+      isPrivate: true,
     },
     {
-      id: "3",
-      title: "Anxious",
-      content: "Those anxious thoughts will pass...",
-      recipient: "younger",
-      mood: "anxious", 
-      date: "2024-04-17T09:15:00Z",
-      isPrivate: true
+      id: '3',
+      title: 'Anxious',
+      content: 'Those anxious thoughts will pass...',
+      recipient: 'younger',
+      mood: 'anxious',
+      date: '2024-04-17T09:15:00Z',
+      isPrivate: true,
     },
     {
-      id: "4",
-      title: "Sad",
+      id: '4',
+      title: 'Sad',
       content: "It's okay to feel sad sometimes...",
-      recipient: "younger",
-      mood: "sad",
-      date: "2024-04-09T16:45:00Z", 
-      isPrivate: true
-    }
-  ]);
-
-  const moodOptions: MoodOption[] = [
-    {
-      id: 'happy',
-      emoji: '😊',
-      label: 'Happy',
-      color: '#FFC107',
-      bgColor: 'bg-yellow-100'
+      recipient: 'younger',
+      mood: 'sad',
+      date: '2024-04-09T16:45:00Z',
+      isPrivate: true,
     },
-    {
-      id: 'sad', 
-      emoji: '😢',
-      label: 'Sad',
-      color: '#2196F3',
-      bgColor: 'bg-blue-100'
-    },
-    {
-      id: 'angry',
-      emoji: '😠', 
-      label: 'Angry',
-      color: '#F44336',
-      bgColor: 'bg-red-100'
-    },
-    {
-      id: 'anxious',
-      emoji: '😰',
-      label: 'Anxious', 
-      color: '#9C27B0',
-      bgColor: 'bg-purple-100'
-    }
-  ];
+  ])
 
-  const prompts = {
-    happy: "Write to your younger self about a moment when you felt truly happy. What would you want them to know about joy?",
-    sad: "Write to your younger self about a time when you felt left out. What would you say to comfort them?",
-    angry: "Write to your younger self about a time when you felt angry or frustrated. How would you help them handle those feelings?",
-    anxious: "Write to your younger self about a time when you felt worried or anxious. What reassurance would you give them?"
-  };
+  const moodOptions = [
+    { id: 'happy',   emoji: '😊', label: 'Happy',   color: '#FFC107', bgColor: 'bg-yellow-100' },
+    { id: 'sad',     emoji: '😢', label: 'Sad',     color: '#2196F3', bgColor: 'bg-blue-100' },
+    { id: 'angry',   emoji: '😠', label: 'Angry',   color: '#F44336', bgColor: 'bg-red-100' },
+    { id: 'anxious', emoji: '😰', label: 'Anxious', color: '#9C27B0', bgColor: 'bg-purple-100' },
+  ] satisfies ReadonlyArray<MoodOption>
 
+  type PromptMood = Exclude<MoodType, 'lonely'>
+
+const prompts: Record<PromptMood, string> = {
+  happy:
+    'Write to your younger self about a moment when you felt truly happy. What would you want them to know about joy?',
+  sad:
+    'Write to your younger self about a time when you felt left out. What would you say to comfort them?',
+  angry:
+    'Write to your younger self about a time when you felt angry or frustrated. How would you help them handle those feelings?',
+  anxious:
+    'Write to your younger self about a time when you felt worried or anxious. What reassurance would you give them?',
+}
+
+  
   const handleMoodSelect = (mood: MoodType) => {
-    setSelectedMood(mood);
-    setCurrentStep('prompt');
-  };
+    setSelectedMood(mood)
+    setCurrentStep('prompt')
+  }
 
   const handleStartWriting = () => {
-    setCurrentStep('writing');
-    setIsWriting(true);
-  };
+    setCurrentStep('writing')
+    setIsWriting(true)
+  }
 
   const handleSaveLetter = () => {
     if (!selectedMood || !letterContent.trim()) {
-      toast.error("Please write your letter");
-      return;
+      toast.error('Please write your letter')
+      return
     }
 
     const newLetter: Letter = {
       id: Date.now().toString(),
-      title: moodOptions.find(m => m.id === selectedMood)?.label || 'Letter',
+      title: MOOD_META[selectedMood].label,
       content: letterContent.trim(),
       recipient: 'younger',
       mood: selectedMood,
       date: new Date().toISOString(),
-      isPrivate: true
-    };
+      isPrivate: true,
+    }
 
-    onSaveLetter(newLetter);
-    setCurrentStep('journal');
-    toast.success("Letter saved! 💙");
-  };
+    onSaveLetter(newLetter)
+    setCurrentStep('journal')
+    toast.success('Letter saved! 💙')
+  }
 
   const handleBack = () => {
-    switch(currentStep) {
+    switch (currentStep) {
       case 'prompt':
-        setCurrentStep('mood');
-        setSelectedMood(null);
-        break;
+        setCurrentStep('mood')
+        setSelectedMood(null)
+        break
       case 'writing':
-        setCurrentStep('prompt');
-        setIsWriting(false);
-        break;
+        setCurrentStep('prompt')
+        setIsWriting(false)
+        break
       case 'journal':
-        setCurrentStep('mood');
-        setSelectedMood(null);
-        setLetterContent("");
-        setIsWriting(false);
-        break;
+        setCurrentStep('mood')
+        setSelectedMood(null)
+        setLetterContent('')
+        setIsWriting(false)
+        break
     }
-  };
+  }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+  const formatDate = (dateString: string) =>
+    new Date(dateString).toLocaleDateString('en-US', {
       month: 'long',
       day: 'numeric',
-      year: 'numeric'
-    });
-  };
+      year: 'numeric',
+    })
 
-  const selectedMoodOption = selectedMood ? moodOptions.find(m => m.id === selectedMood) : null;
+  const selectedMoodOption = selectedMood
+    ? moodOptions.find((m) => m.id === selectedMood)
+    : null
 
-  // Mood Selection Step
+  // Mood Selection
   if (currentStep === 'mood') {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">
-        {/* Header */}
         <div className="bg-white border-b border-gray-200 px-6 py-4">
           <h1 className="text-2xl font-medium text-gray-900">DearEcho</h1>
         </div>
 
-        {/* Content */}
         <div className="flex-1 flex flex-col justify-center px-6 pb-20">
           <div className="text-center mb-12">
             <h2 className="text-2xl font-medium text-gray-900 mb-12">
-              How are you feeling?
+              How are you feeling{user ? `, ${user.name}` : ''}?
             </h2>
 
-            {/* Mood Grid */}
             <div className="grid grid-cols-2 gap-6 max-w-sm mx-auto">
               {moodOptions.map((mood) => (
                 <Button
@@ -201,41 +191,34 @@ export function LetterWriter({ user, onSaveLetter }: LetterWriterProps) {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
-  // Prompt Step  
-  if (currentStep === 'prompt' && selectedMoodOption) {
+  // Prompt
+ if (currentStep === 'prompt' && selectedMoodOption) {
+  const promptText = prompts[selectedMoodOption.id] 
+
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">
-        {/* Header */}
         <div className="bg-white border-b border-gray-200 px-4 py-4 flex items-center">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleBack}
-            className="mr-4 p-2"
-          >
+          <Button variant="ghost" size="sm" onClick={handleBack} className="mr-4 p-2">
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <h1 className="text-xl font-medium text-gray-900 capitalize">{selectedMoodOption.label}</h1>
+          <h1 className="text-xl font-medium text-gray-900 capitalize">
+            {selectedMoodOption.label}
+          </h1>
         </div>
 
-        {/* Content */}
         <div className="flex-1 flex flex-col justify-center px-6 pb-20">
-          {/* Illustration */}
           <div className="text-center mb-8">
             <div className="w-32 h-32 mx-auto mb-8 bg-gray-200 rounded-full flex items-center justify-center">
-              {/* Simple illustration representation */}
-              <div className="w-20 h-20 bg-gray-300 rounded-full opacity-60"></div>
+              <div className="w-20 h-20 bg-gray-300 rounded-full opacity-60" />
             </div>
 
-            {/* Prompt Text */}
             <p className="text-lg text-gray-700 leading-relaxed max-w-md mx-auto mb-12">
-              {prompts[selectedMoodOption.id]}
+              {promptText}
             </p>
 
-            {/* Start Writing Button */}
             <Button
               onClick={handleStartWriting}
               size="lg"
@@ -246,22 +229,18 @@ export function LetterWriter({ user, onSaveLetter }: LetterWriterProps) {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
-  // Writing Step
+  // Writing
   if (currentStep === 'writing' && selectedMoodOption) {
+    const meta = MOOD_META[selectedMoodOption.id]
+
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">
-        {/* Header */}
         <div className="bg-white border-b border-gray-200 px-4 py-4 flex items-center justify-between">
           <div className="flex items-center">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleBack}
-              className="mr-4 p-2"
-            >
+            <Button variant="ghost" size="sm" onClick={handleBack} className="mr-4 p-2">
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <h1 className="text-xl font-medium text-gray-900">DearEcho</h1>
@@ -271,17 +250,16 @@ export function LetterWriter({ user, onSaveLetter }: LetterWriterProps) {
           </Button>
         </div>
 
-        {/* Writing Area */}
         <div className="flex-1 p-6 pb-20">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 h-full">
             <div className="p-6 h-full flex flex-col">
-              {/* Mood indicator */}
               <div className="flex items-center mb-4">
-                <span className="text-2xl mr-2">{selectedMoodOption.emoji}</span>
-                <span className="text-lg font-medium text-gray-700 capitalize">{selectedMoodOption.label}</span>
+                <span className="text-2xl mr-2">{meta.emoji}</span>
+                <span className="text-lg font-medium text-gray-700 capitalize">
+                  {meta.label}
+                </span>
               </div>
 
-              {/* Textarea */}
               <Textarea
                 value={letterContent}
                 onChange={(e) => setLetterContent(e.target.value)}
@@ -290,7 +268,6 @@ export function LetterWriter({ user, onSaveLetter }: LetterWriterProps) {
                 style={{ minHeight: '400px' }}
               />
 
-              {/* Save Button */}
               <div className="pt-4 border-t border-gray-100">
                 <Button
                   onClick={handleSaveLetter}
@@ -305,22 +282,16 @@ export function LetterWriter({ user, onSaveLetter }: LetterWriterProps) {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
-  // Journal Step
+  // Journal
   if (currentStep === 'journal') {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">
-        {/* Header */}
-        <div className="bg-white border-b border-gray-200 px-4 py-4 flex items-center justify-between">
+        <div className="bg-white border-b border-gray-200 px-4 py-4 flex items={ 'center' } justify-between">
           <div className="flex items-center">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleBack}
-              className="mr-4 p-2"
-            >
+            <Button variant="ghost" size="sm" onClick={handleBack} className="mr-4 p-2">
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <h1 className="text-xl font-medium text-gray-900">DearEcho</h1>
@@ -330,32 +301,25 @@ export function LetterWriter({ user, onSaveLetter }: LetterWriterProps) {
           </Button>
         </div>
 
-        {/* Journal Header */}
         <div className="bg-white px-6 py-4 border-b border-gray-100">
           <h2 className="text-2xl font-medium text-gray-900">Journal</h2>
         </div>
 
-        {/* Journal Entries */}
         <div className="flex-1 p-6 pb-32">
           <div className="space-y-4">
             {previousLetters.map((letter) => {
-              const moodEmoji = moodOptions.find(m => m.id === letter.mood)?.emoji || 
-                               (letter.mood === 'lonely' ? '😔' : '😐');
-              const moodColor = letter.mood === 'happy' ? 'text-yellow-600' :
-                               letter.mood === 'sad' ? 'text-blue-600' :
-                               letter.mood === 'anxious' ? 'text-purple-600' :
-                               letter.mood === 'lonely' ? 'text-gray-600' : 'text-gray-600';
-              
+              const meta = MOOD_META[letter.mood]
+
               return (
                 <Card key={letter.id} className="bg-white border-gray-200 shadow-sm">
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                          <span className="text-lg">{moodEmoji}</span>
+                          <span className="text-lg">{meta.emoji}</span>
                         </div>
                         <div>
-                          <div className={`font-medium ${moodColor} capitalize`}>
+                          <div className={`font-medium ${meta.color} capitalize`}>
                             {letter.title}
                           </div>
                           <div className="text-sm text-gray-500">
@@ -363,17 +327,16 @@ export function LetterWriter({ user, onSaveLetter }: LetterWriterProps) {
                           </div>
                         </div>
                       </div>
-                      <div className={`px-3 py-1 rounded-full text-sm ${moodColor} bg-gray-50 capitalize`}>
+                      <div className={`px-3 py-1 rounded-full text-sm ${meta.color} bg-gray-50 capitalize`}>
                         {letter.mood}
                       </div>
                     </div>
                   </CardContent>
                 </Card>
-              );
+              )
             })}
           </div>
 
-          {/* Inspirational Quote */}
           <div className="mt-8 p-6 bg-white rounded-2xl shadow-sm border border-gray-200">
             <p className="text-center text-gray-700 leading-relaxed mb-4">
               "You are worthy of the same kindness you give to others."
@@ -381,10 +344,10 @@ export function LetterWriter({ user, onSaveLetter }: LetterWriterProps) {
             <div className="flex justify-center">
               <Button
                 onClick={() => {
-                  setCurrentStep('mood');
-                  setSelectedMood(null);
-                  setLetterContent("");
-                  setIsWriting(false);
+                  setCurrentStep('mood')
+                  setSelectedMood(null)
+                  setLetterContent('')
+                  setIsWriting(false)
                 }}
                 className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-full flex items-center space-x-2"
               >
@@ -395,8 +358,8 @@ export function LetterWriter({ user, onSaveLetter }: LetterWriterProps) {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
-  return null;
+  return null
 }

@@ -1,116 +1,151 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import { Button } from "./ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Textarea } from "./ui/textarea";
-import { Badge } from "./ui/badge";
-import { Separator } from "./ui/separator";
-import { 
-  BookOpen, 
-  Lightbulb, 
-  Target, 
+import { useMemo, useState } from 'react'
+import { Button } from './ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
+import { Textarea } from './ui/textarea'
+import { Badge } from './ui/badge'
+import {
+  BookOpen,
+  Lightbulb,
+  Target,
   Heart,
   RefreshCw,
   Save,
   Sparkles,
   Clock,
-  ChevronRight
-} from "lucide-react";
-import { toast } from "sonner@2.0.3";
-import { User } from "../App";
+  ChevronRight,
+} from 'lucide-react'
+// at the top with other imports
+import type { LucideIcon } from 'lucide-react'
+import { toast } from 'sonner'
+import type { User } from '../types'
 
 interface GuidedJournalProps {
-  user: User | null;
+  user: User | null
 }
 
+type PromptCategory =
+  | 'Gratitude'
+  | 'Self-Reflection'
+  | 'Growth'
+  | 'Self-Compassion'
+  | 'Future Self'
+
+type PromptDef = {
+  category: PromptCategory
+  icon: LucideIcon                // ← use LucideIcon here
+  color: string
+  bgColor: string
+  question: string
+  subtext: string
+}
+
+
+const JOURNAL_PROMPTS: PromptDef[] = [
+  {
+    category: 'Gratitude',
+    icon: Heart,
+    color: 'from-pink-500 to-rose-600',
+    bgColor: 'bg-pink-50',
+    question: "What are three things you're grateful for today?",
+    subtext:
+      'Even small moments of appreciation can shift our perspective toward positivity.',
+  },
+  {
+    category: 'Self-Reflection',
+    icon: Lightbulb,
+    color: 'from-yellow-500 to-orange-600',
+    bgColor: 'bg-yellow-50',
+    question:
+      'What emotion did you feel most strongly today, and what might have triggered it?',
+    subtext:
+      'Understanding our emotional patterns helps us respond more mindfully.',
+  },
+  {
+    category: 'Growth',
+    icon: Target,
+    color: 'from-green-500 to-teal-600',
+    bgColor: 'bg-green-50',
+    question:
+      "What's one small step you could take tomorrow toward feeling better?",
+    subtext:
+      'Progress comes from small, consistent actions that build over time.',
+  },
+  {
+    category: 'Self-Compassion',
+    icon: Sparkles,
+    color: 'from-purple-500 to-indigo-600',
+    bgColor: 'bg-purple-50',
+    question:
+      'What would you say to comfort a dear friend who was feeling the way you feel right now?',
+    subtext:
+      'We often have more compassion for others than ourselves. Practice extending that kindness inward.',
+  },
+  {
+    category: 'Future Self',
+    icon: Clock,
+    color: 'from-blue-500 to-cyan-600',
+    bgColor: 'bg-blue-50',
+    question:
+      'What do you hope to remember about today when you look back on it?',
+    subtext:
+      'Creating meaning from our experiences helps us find purpose in both challenges and joys.',
+  },
+]
+
 export function GuidedJournal({ user }: GuidedJournalProps) {
-  const [currentPromptIndex, setCurrentPromptIndex] = useState(0);
-  const [responses, setResponses] = useState<{[key: number]: string}>({});
-  const [isCompleted, setIsCompleted] = useState(false);
+  const [currentPromptIndex, setCurrentPromptIndex] = useState(0)
+  const [responses, setResponses] = useState<Record<number, string>>({})
+  const [isCompleted, setIsCompleted] = useState(false)
 
-  const journalPrompts = [
-    {
-      category: "Gratitude",
-      icon: Heart,
-      color: "from-pink-500 to-rose-600",
-      bgColor: "bg-pink-50",
-      question: "What are three things you're grateful for today?",
-      subtext: "Even small moments of appreciation can shift our perspective toward positivity."
-    },
-    {
-      category: "Self-Reflection",
-      icon: Lightbulb,
-      color: "from-yellow-500 to-orange-600",
-      bgColor: "bg-yellow-50",
-      question: "What emotion did you feel most strongly today, and what might have triggered it?",
-      subtext: "Understanding our emotional patterns helps us respond more mindfully."
-    },
-    {
-      category: "Growth",
-      icon: Target,
-      color: "from-green-500 to-teal-600",
-      bgColor: "bg-green-50",
-      question: "What's one small step you could take tomorrow toward feeling better?",
-      subtext: "Progress comes from small, consistent actions that build over time."
-    },
-    {
-      category: "Self-Compassion",
-      icon: Sparkles,
-      color: "from-purple-500 to-indigo-600",
-      bgColor: "bg-purple-50",
-      question: "What would you say to comfort a dear friend who was feeling the way you feel right now?",
-      subtext: "We often have more compassion for others than ourselves. Practice extending that kindness inward."
-    },
-    {
-      category: "Future Self",
-      icon: Clock,
-      color: "from-blue-500 to-cyan-600",
-      bgColor: "bg-blue-50",
-      question: "What do you hope to remember about today when you look back on it?",
-      subtext: "Creating meaning from our experiences helps us find purpose in both challenges and joys."
-    }
-  ];
-
-  const currentPrompt = journalPrompts[currentPromptIndex];
-  const Icon = currentPrompt.icon;
+  const total = JOURNAL_PROMPTS.length
+  const currentPrompt = useMemo(
+    () => JOURNAL_PROMPTS[currentPromptIndex],
+    [currentPromptIndex]
+  )
+  const Icon = currentPrompt.icon
 
   const handleResponseChange = (value: string) => {
-    setResponses(prev => ({
-      ...prev,
-      [currentPromptIndex]: value
-    }));
-  };
+    setResponses((prev) => ({ ...prev, [currentPromptIndex]: value }))
+  }
 
   const goToNextPrompt = () => {
-    if (currentPromptIndex < journalPrompts.length - 1) {
-      setCurrentPromptIndex(prev => prev + 1);
-    } else {
-      setIsCompleted(true);
+    if (!responses[currentPromptIndex]?.trim()) {
+      toast.message('Take a moment to jot a few words 🙂')
+      return
     }
-  };
+    if (currentPromptIndex < total - 1) {
+      setCurrentPromptIndex((prev) => prev + 1)
+    } else {
+      setIsCompleted(true)
+    }
+  }
 
   const goToPreviousPrompt = () => {
-    if (currentPromptIndex > 0) {
-      setCurrentPromptIndex(prev => prev - 1);
-    }
-  };
+    if (currentPromptIndex > 0) setCurrentPromptIndex((prev) => prev - 1)
+  }
 
   const saveJournalEntry = () => {
-    const completedResponses = Object.keys(responses).length;
-    toast.success(`Journal entry saved! You completed ${completedResponses} of ${journalPrompts.length} prompts. 💙`);
-    
-    // Reset for next session
-    setResponses({});
-    setCurrentPromptIndex(0);
-    setIsCompleted(false);
-  };
+    const completed = Object.values(responses).filter(Boolean).length
+    toast.success(
+      `Journal entry saved! You completed ${completed} of ${total} prompts. 💙`
+    )
+    // TODO: persist to API/localStorage here if desired
+    setResponses({})
+    setCurrentPromptIndex(0)
+    setIsCompleted(false)
+  }
 
   const getRandomPrompt = () => {
-    const randomIndex = Math.floor(Math.random() * journalPrompts.length);
-    setCurrentPromptIndex(randomIndex);
-    setIsCompleted(false);
-  };
+    if (total <= 1) return
+    let next = Math.floor(Math.random() * total)
+    if (next === currentPromptIndex) {
+      next = (next + 1) % total
+    }
+    setCurrentPromptIndex(next)
+    setIsCompleted(false)
+  }
 
   if (isCompleted) {
     return (
@@ -119,24 +154,37 @@ export function GuidedJournal({ user }: GuidedJournalProps) {
           <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-green-500 to-teal-600 rounded-full mb-6 shadow-xl">
             <Sparkles className="w-10 h-10 text-white" />
           </div>
-          
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Beautiful Work!</h1>
+
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">
+            Beautiful Work{user ? `, ${user.name}` : ''}!
+          </h1>
           <p className="text-lg text-gray-600 mb-8">
-            You've completed your guided journal session. Take a moment to appreciate this time you've given yourself.
+            You’ve completed your guided journal session. Take a moment to
+            appreciate this time you’ve given yourself.
           </p>
 
           <Card className="shadow-xl border-0 bg-white/70 backdrop-blur-sm mb-8">
             <CardContent className="p-8">
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">Your Responses Summary</h3>
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                Your Responses Summary
+              </h3>
               <div className="space-y-4 text-left">
-                {journalPrompts.map((prompt, index) => (
-                  responses[index] && (
-                    <div key={index} className="border-l-4 border-blue-300 pl-4">
-                      <p className="font-medium text-gray-700 mb-1">{prompt.question}</p>
-                      <p className="text-gray-600 text-sm line-clamp-2">{responses[index]}</p>
-                    </div>
-                  )
-                ))}
+                {JOURNAL_PROMPTS.map(
+                  (prompt, index) =>
+                    responses[index]?.trim() && (
+                      <div
+                        key={index}
+                        className="border-l-4 border-blue-300 pl-4"
+                      >
+                        <p className="font-medium text-gray-700 mb-1">
+                          {prompt.question}
+                        </p>
+                        <p className="text-gray-600 text-sm whitespace-pre-wrap">
+                          {responses[index]}
+                        </p>
+                      </div>
+                    )
+                )}
               </div>
             </CardContent>
           </Card>
@@ -150,19 +198,19 @@ export function GuidedJournal({ user }: GuidedJournalProps) {
               <Save className="w-5 h-5 mr-2" />
               Save Journal Entry
             </Button>
-            
+
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
                 onClick={() => {
-                  setCurrentPromptIndex(0);
-                  setIsCompleted(false);
+                  setCurrentPromptIndex(0)
+                  setIsCompleted(false)
                 }}
                 variant="outline"
                 className="px-6 py-3 rounded-xl border-2 border-gray-200 hover:bg-gray-50"
               >
                 Start Over
               </Button>
-              
+
               <Button
                 onClick={getRandomPrompt}
                 variant="outline"
@@ -175,7 +223,7 @@ export function GuidedJournal({ user }: GuidedJournalProps) {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -186,37 +234,45 @@ export function GuidedJournal({ user }: GuidedJournalProps) {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full mb-4 shadow-lg">
             <BookOpen className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Guided Journal</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Guided Journal
+          </h1>
           <p className="text-lg text-gray-600">
             Thoughtful prompts to help you explore your inner world
           </p>
         </div>
 
         {/* Progress */}
-        <div className="mb-8">
+        <div className="mb-8" aria-label="progress">
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm text-gray-600">Progress</span>
             <span className="text-sm text-gray-600">
-              {currentPromptIndex + 1} of {journalPrompts.length}
+              {currentPromptIndex + 1} of {total}
             </span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div 
+            <div
               className="bg-gradient-to-r from-indigo-500 to-purple-600 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${((currentPromptIndex + 1) / journalPrompts.length) * 100}%` }}
-            ></div>
+              style={{ width: `${((currentPromptIndex + 1) / total) * 100}%` }}
+            />
           </div>
         </div>
 
         {/* Current Prompt */}
-        <Card className={`shadow-xl border-0 bg-white/70 backdrop-blur-sm mb-6 ${currentPrompt.bgColor} border-l-4 border-l-current`}>
+        <Card
+          className={`shadow-xl border-0 bg-white/70 backdrop-blur-sm mb-6 ${currentPrompt.bgColor} border-l-4 border-l-current`}
+        >
           <CardHeader>
             <div className="flex items-center space-x-3">
-              <div className={`inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br ${currentPrompt.color} rounded-full shadow-lg`}>
+              <div
+                className={`inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br ${currentPrompt.color} rounded-full shadow-lg`}
+              >
                 <Icon className="w-6 h-6 text-white" />
               </div>
               <div>
-                <Badge className={`${currentPrompt.bgColor} text-gray-700 border-0 mb-2`}>
+                <Badge
+                  className={`${currentPrompt.bgColor} text-gray-700 border-0 mb-2`}
+                >
                   {currentPrompt.category}
                 </Badge>
                 <CardTitle className="text-xl text-gray-800">
@@ -232,14 +288,15 @@ export function GuidedJournal({ user }: GuidedJournalProps) {
 
             <Textarea
               placeholder="Take your time... there's no right or wrong answer. Write from your heart."
-              value={responses[currentPromptIndex] || ""}
+              value={responses[currentPromptIndex] ?? ''}
               onChange={(e) => handleResponseChange(e.target.value)}
               rows={6}
               className="resize-none border-2 border-gray-200 focus:border-indigo-400 bg-white/50 text-base leading-relaxed"
             />
-            
+
             <p className="text-sm text-gray-500 mt-2">
-              💭 Let your thoughts flow naturally - this is your safe space for reflection
+              💭 Let your thoughts flow naturally — this is your safe space for
+              reflection.
             </p>
           </CardContent>
         </Card>
@@ -271,7 +328,7 @@ export function GuidedJournal({ user }: GuidedJournalProps) {
             onClick={goToNextPrompt}
             className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
           >
-            {currentPromptIndex === journalPrompts.length - 1 ? 'Complete' : 'Next'}
+            {currentPromptIndex === total - 1 ? 'Complete' : 'Next'}
             <ChevronRight className="w-4 h-4 ml-2" />
           </Button>
         </div>
@@ -283,40 +340,53 @@ export function GuidedJournal({ user }: GuidedJournalProps) {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {journalPrompts.map((prompt, index) => {
-                const PromptIcon = prompt.icon;
-                const isCompleted = responses[index] && responses[index].length > 0;
-                const isCurrent = index === currentPromptIndex;
-                
+              {JOURNAL_PROMPTS.map((prompt, index) => {
+                const PromptIcon = prompt.icon
+                const answered = Boolean(responses[index]?.trim())
+                const isCurrent = index === currentPromptIndex
+
                 return (
-                  <div
+                  <button
                     key={index}
-                    className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition-all duration-200 ${
-                      isCurrent 
-                        ? 'bg-indigo-100 border-2 border-indigo-300' 
-                        : isCompleted 
-                          ? 'bg-green-50 border-2 border-green-200'
-                          : 'bg-gray-50 border-2 border-gray-200 hover:bg-gray-100'
-                    }`}
+                    type="button"
                     onClick={() => setCurrentPromptIndex(index)}
+                    className={`w-full text-left flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 ${
+                      isCurrent
+                        ? 'bg-indigo-100 border-2 border-indigo-300'
+                        : answered
+                        ? 'bg-green-50 border-2 border-green-200'
+                        : 'bg-gray-50 border-2 border-gray-200 hover:bg-gray-100'
+                    }`}
                   >
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      isCurrent ? 'bg-indigo-500' : isCompleted ? 'bg-green-500' : 'bg-gray-400'
-                    }`}>
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                        isCurrent
+                          ? 'bg-indigo-500'
+                          : answered
+                          ? 'bg-green-500'
+                          : 'bg-gray-400'
+                      }`}
+                    >
                       <PromptIcon className="w-4 h-4 text-white" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-800">{prompt.category}</p>
-                      <p className="text-xs text-gray-600 line-clamp-1">{prompt.question}</p>
+                      <p className="text-sm font-medium text-gray-800">
+                        {prompt.category}
+                      </p>
+                      <p className="text-xs text-gray-600 line-clamp-1">
+                        {prompt.question}
+                      </p>
                     </div>
-                    {isCompleted && <Sparkles className="w-4 h-4 text-green-500" />}
-                  </div>
-                );
+                    {answered && (
+                      <Sparkles className="w-4 h-4 text-green-500" />
+                    )}
+                  </button>
+                )
               })}
             </div>
           </CardContent>
         </Card>
       </div>
     </div>
-  );
+  )
 }

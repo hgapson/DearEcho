@@ -1,113 +1,108 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import { Button } from "./ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import { Separator } from "./ui/separator";
-import { 
-  Mail, 
-  Lock, 
-  User, 
-  Eye, 
+import { useState } from 'react'
+import { Button } from './ui/button'
+import { Card, CardContent, CardHeader } from './ui/card'
+import { Input } from './ui/input'
+import { Label } from './ui/label'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs'
+import { Separator } from './ui/separator'
+import {
+  Mail,
+  Lock,
+  User as UserIcon, // ⬅️ rename icon to avoid clash
+  Eye,
   EyeOff,
   Heart,
   Sparkles,
-  Shield
-} from "lucide-react";
-import { toast } from "sonner@2.0.3";
-import { User as UserType } from "../App";
+  Shield,
+} from 'lucide-react'
+import { toast } from 'sonner'
+
+// ⬅️ import types only, from the correct file
+import type { User as AppUser } from '../types'
 
 interface AuthPageProps {
-  onLogin: (user: UserType) => void;
+  onLogin: (user: AppUser) => void // ⬅️ use the actual type
 }
 
 export function AuthPage({ onLogin }: AuthPageProps) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
   const [loginForm, setLoginForm] = useState({
-    email: "",
-    password: ""
-  });
+    email: '',
+    password: '',
+  })
   const [registerForm, setRegisterForm] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: ""
-  });
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+  })
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+    e.preventDefault()
+    setIsLoading(true)
 
-    // Simulate API call
     setTimeout(() => {
       if (loginForm.email && loginForm.password) {
-        const user: UserType = {
-          id: "user_" + Date.now(),
+        const user: AppUser = {
+          id: 'user_' + Date.now(),
           name: loginForm.email.split('@')[0],
           email: loginForm.email,
-          joinDate: new Date().toISOString(),
-          userType: 'user'
-        };
-        onLogin(user);
-        toast.success("Welcome back to DearEcho! 💙");
+        }
+        onLogin(user)
+        toast.success('Welcome back to DearEcho! 💙')
       } else {
-        toast.error("Please fill in all fields");
+        toast.error('Please fill in all fields')
       }
-      setIsLoading(false);
-    }, 1000);
-  };
+      setIsLoading(false)
+    }, 1000)
+  }
 
   const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+    e.preventDefault()
+    setIsLoading(true)
 
-    // Basic validation
     if (registerForm.password !== registerForm.confirmPassword) {
-      toast.error("Passwords don't match");
-      setIsLoading(false);
-      return;
+      toast.error("Passwords don't match")
+      setIsLoading(false)
+      return
     }
 
     if (registerForm.password.length < 6) {
-      toast.error("Password must be at least 6 characters");
-      setIsLoading(false);
-      return;
+      toast.error('Password must be at least 6 characters')
+      setIsLoading(false)
+      return
     }
 
-    // Simulate API call
     setTimeout(() => {
       if (registerForm.name && registerForm.email && registerForm.password) {
-        const user: UserType = {
-          id: "user_" + Date.now(),
+        const user: AppUser = {
+          id: 'user_' + Date.now(),
           name: registerForm.name,
           email: registerForm.email,
-          joinDate: new Date().toISOString(),
-          userType: 'user'
-        };
-        onLogin(user);
-        toast.success("Welcome to DearEcho! Your healing journey begins now. 💙");
+        }
+        onLogin(user)
+        toast.success(
+          'Welcome to DearEcho! Your healing journey begins now. 💙'
+        )
       } else {
-        toast.error("Please fill in all fields");
+        toast.error('Please fill in all fields')
       }
-      setIsLoading(false);
-    }, 1000);
-  };
+      setIsLoading(false)
+    }, 1000)
+  }
 
   const handleDemoLogin = () => {
-    const demoUser: UserType = {
-      id: "demo_user",
-      name: "Demo User",
-      email: "demo@dearecho.com",
-      joinDate: new Date().toISOString(),
-      userType: 'user'
-    };
-    onLogin(demoUser);
-    toast.success("Welcome to the DearEcho demo! 🌟");
-  };
+    const demoUser: AppUser = {
+      id: 'demo_user',
+      name: 'Demo User',
+      email: 'demo@dearecho.com',
+    }
+    onLogin(demoUser)
+    toast.success('Welcome to the DearEcho demo! 🌟')
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-blue-50/50 via-purple-50/30 to-pink-50/50">
@@ -136,13 +131,13 @@ export function AuthPage({ onLogin }: AuthPageProps) {
           <CardContent>
             <Tabs defaultValue="login" className="space-y-4">
               <TabsList className="grid w-full grid-cols-2 bg-gray-100/50">
-                <TabsTrigger 
-                  value="login" 
+                <TabsTrigger
+                  value="login"
                   className="data-[state=active]:bg-white data-[state=active]:shadow-sm"
                 >
                   Sign In
                 </TabsTrigger>
-                <TabsTrigger 
+                <TabsTrigger
                   value="register"
                   className="data-[state=active]:bg-white data-[state=active]:shadow-sm"
                 >
@@ -154,17 +149,22 @@ export function AuthPage({ onLogin }: AuthPageProps) {
               <TabsContent value="login" className="space-y-4">
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="login-email" className="text-sm font-medium text-gray-700">
+                    <Label
+                      htmlFor="login-email"
+                      className="text-sm font-medium text-gray-700"
+                    >
                       Email Address
                     </Label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <Input
                         id="login-email"
                         type="email"
                         placeholder="your.email@example.com"
                         value={loginForm.email}
-                        onChange={(e) => setLoginForm({...loginForm, email: e.target.value})}
+                        onChange={(e) =>
+                          setLoginForm({ ...loginForm, email: e.target.value })
+                        }
                         className="pl-10 border-2 border-gray-200 focus:border-blue-400 bg-white/50"
                         required
                       />
@@ -172,17 +172,25 @@ export function AuthPage({ onLogin }: AuthPageProps) {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="login-password" className="text-sm font-medium text-gray-700">
+                    <Label
+                      htmlFor="login-password"
+                      className="text-sm font-medium text-gray-700"
+                    >
                       Password
                     </Label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <Input
                         id="login-password"
-                        type={showPassword ? "text" : "password"}
+                        type={showPassword ? 'text' : 'password'}
                         placeholder="Enter your password"
                         value={loginForm.password}
-                        onChange={(e) => setLoginForm({...loginForm, password: e.target.value})}
+                        onChange={(e) =>
+                          setLoginForm({
+                            ...loginForm,
+                            password: e.target.value,
+                          })
+                        }
                         className="pl-10 pr-10 border-2 border-gray-200 focus:border-blue-400 bg-white/50"
                         required
                       />
@@ -190,10 +198,14 @@ export function AuthPage({ onLogin }: AuthPageProps) {
                         type="button"
                         variant="ghost"
                         size="sm"
-                        className="absolute right-1 top-1/2 transform -translate-y-1/2 h-7 w-7 p-0"
+                        className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0"
                         onClick={() => setShowPassword(!showPassword)}
                       >
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        {showPassword ? (
+                          <EyeOff className="w-4 h-4" />
+                        ) : (
+                          <Eye className="w-4 h-4" />
+                        )}
                       </Button>
                     </div>
                   </div>
@@ -205,11 +217,11 @@ export function AuthPage({ onLogin }: AuthPageProps) {
                   >
                     {isLoading ? (
                       <div className="flex items-center space-x-2">
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                         <span>Signing In...</span>
                       </div>
                     ) : (
-                      "Sign In to DearEcho"
+                      'Sign In to DearEcho'
                     )}
                   </Button>
                 </form>
@@ -228,17 +240,25 @@ export function AuthPage({ onLogin }: AuthPageProps) {
               <TabsContent value="register" className="space-y-4">
                 <form onSubmit={handleRegister} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="register-name" className="text-sm font-medium text-gray-700">
+                    <Label
+                      htmlFor="register-name"
+                      className="text-sm font-medium text-gray-700"
+                    >
                       Full Name
                     </Label>
                     <div className="relative">
-                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <Input
                         id="register-name"
                         type="text"
                         placeholder="Your full name"
                         value={registerForm.name}
-                        onChange={(e) => setRegisterForm({...registerForm, name: e.target.value})}
+                        onChange={(e) =>
+                          setRegisterForm({
+                            ...registerForm,
+                            name: e.target.value,
+                          })
+                        }
                         className="pl-10 border-2 border-gray-200 focus:border-blue-400 bg-white/50"
                         required
                       />
@@ -246,17 +266,25 @@ export function AuthPage({ onLogin }: AuthPageProps) {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="register-email" className="text-sm font-medium text-gray-700">
+                    <Label
+                      htmlFor="register-email"
+                      className="text-sm font-medium text-gray-700"
+                    >
                       Email Address
                     </Label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <Input
                         id="register-email"
                         type="email"
                         placeholder="your.email@example.com"
                         value={registerForm.email}
-                        onChange={(e) => setRegisterForm({...registerForm, email: e.target.value})}
+                        onChange={(e) =>
+                          setRegisterForm({
+                            ...registerForm,
+                            email: e.target.value,
+                          })
+                        }
                         className="pl-10 border-2 border-gray-200 focus:border-blue-400 bg-white/50"
                         required
                       />
@@ -264,17 +292,25 @@ export function AuthPage({ onLogin }: AuthPageProps) {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="register-password" className="text-sm font-medium text-gray-700">
+                    <Label
+                      htmlFor="register-password"
+                      className="text-sm font-medium text-gray-700"
+                    >
                       Password
                     </Label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <Input
                         id="register-password"
-                        type={showPassword ? "text" : "password"}
+                        type={showPassword ? 'text' : 'password'}
                         placeholder="Choose a strong password"
                         value={registerForm.password}
-                        onChange={(e) => setRegisterForm({...registerForm, password: e.target.value})}
+                        onChange={(e) =>
+                          setRegisterForm({
+                            ...registerForm,
+                            password: e.target.value,
+                          })
+                        }
                         className="pl-10 pr-10 border-2 border-gray-200 focus:border-blue-400 bg-white/50"
                         required
                       />
@@ -282,26 +318,38 @@ export function AuthPage({ onLogin }: AuthPageProps) {
                         type="button"
                         variant="ghost"
                         size="sm"
-                        className="absolute right-1 top-1/2 transform -translate-y-1/2 h-7 w-7 p-0"
+                        className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0"
                         onClick={() => setShowPassword(!showPassword)}
                       >
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        {showPassword ? (
+                          <EyeOff className="w-4 h-4" />
+                        ) : (
+                          <Eye className="w-4 h-4" />
+                        )}
                       </Button>
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="register-confirm" className="text-sm font-medium text-gray-700">
+                    <Label
+                      htmlFor="register-confirm"
+                      className="text-sm font-medium text-gray-700"
+                    >
                       Confirm Password
                     </Label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <Input
                         id="register-confirm"
                         type="password"
                         placeholder="Confirm your password"
                         value={registerForm.confirmPassword}
-                        onChange={(e) => setRegisterForm({...registerForm, confirmPassword: e.target.value})}
+                        onChange={(e) =>
+                          setRegisterForm({
+                            ...registerForm,
+                            confirmPassword: e.target.value,
+                          })
+                        }
                         className="pl-10 border-2 border-gray-200 focus:border-blue-400 bg-white/50"
                         required
                       />
@@ -315,17 +363,18 @@ export function AuthPage({ onLogin }: AuthPageProps) {
                   >
                     {isLoading ? (
                       <div className="flex items-center space-x-2">
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                         <span>Creating Account...</span>
                       </div>
                     ) : (
-                      "Start Your Journey"
+                      'Start Your Journey'
                     )}
                   </Button>
                 </form>
 
                 <div className="text-xs text-gray-500 text-center">
-                  By signing up, you agree to our Terms of Service and Privacy Policy
+                  By signing up, you agree to our Terms of Service and Privacy
+                  Policy
                 </div>
               </TabsContent>
             </Tabs>
@@ -350,5 +399,5 @@ export function AuthPage({ onLogin }: AuthPageProps) {
         </Card>
       </div>
     </div>
-  );
+  )
 }

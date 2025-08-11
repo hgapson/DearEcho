@@ -1,23 +1,31 @@
-"use client";
+'use client'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
-import { Badge } from "../ui/badge";
-import { Progress } from "../ui/progress";
-import { Award } from "lucide-react";
-import { WellnessGoal } from "../../types/wellness";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '../ui/card'
+import { Badge } from '../ui/badge'
+import { Progress } from '../ui/progress'
+import { Award } from 'lucide-react'
+import { WellnessGoal } from '../../types/wellness'
 
 interface WellnessGoalCardProps {
-  goal: WellnessGoal;
+  goal: WellnessGoal
 }
 
 export function WellnessGoalCard({ goal }: WellnessGoalCardProps) {
-  const progress = (goal.currentValue / goal.targetValue) * 100;
-  const isCompleted = goal.currentValue >= goal.targetValue;
-  
+  const progress = (goal.currentValue / goal.targetValue) * 100
+  const isCompleted = goal.currentValue >= goal.targetValue
+
   return (
-    <Card className={`border-l-4 ${
-      isCompleted ? 'border-l-green-500 bg-green-50' : 'border-l-blue-500'
-    }`}>
+    <Card
+      className={`border-l-4 ${
+        isCompleted ? 'border-l-green-500 bg-green-50' : 'border-l-blue-500'
+      }`}
+    >
       <CardHeader>
         <div className="flex items-start justify-between">
           <div>
@@ -42,11 +50,13 @@ export function WellnessGoalCard({ goal }: WellnessGoalCardProps) {
           </div>
           <Progress value={Math.min(progress, 100)} />
           <div className="flex items-center justify-between text-sm text-gray-600">
-            <span>Deadline: {new Date(goal.deadline).toLocaleDateString()}</span>
+            <span>
+              Deadline: {new Date(goal.deadline).toLocaleDateString()}
+            </span>
             <span>{Math.round(progress)}% complete</span>
           </div>
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }

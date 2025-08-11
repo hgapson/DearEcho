@@ -1,84 +1,122 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import { Button } from "./ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
-import { Progress } from "./ui/progress";
-import { Badge } from "./ui/badge";
-import { 
-  Target,
-  Plus,
-  Flame,
-  Award,
-  Brain
-} from "lucide-react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { Textarea } from "./ui/textarea";
+import { useState } from 'react'
+import { Button } from './ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from './ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs'
+import { Input } from './ui/input'
+import { Label } from './ui/label'
+import { Progress } from './ui/progress'
+import { Badge } from './ui/badge'
+import { Target, Plus, Flame, Award, Brain } from 'lucide-react'
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+} from 'recharts'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from './ui/dialog'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from './ui/select'
+import { Textarea } from './ui/textarea'
 
 // Import refactored components and utilities
-import { WellnessMetricCard } from "./wellness/WellnessMetricCard";
-import { TodayActivities } from "./wellness/TodayActivities";
-import { WellnessGoalCard } from "./wellness/WellnessGoalCard";
-import { WELLNESS_METRICS, WEEKLY_PROGRESS_DATA, MOCK_WELLNESS_GOALS } from "../constants/wellness";
-import { getWellnessScore, getMetricProgress, getStreakCount } from "../utils/wellness-helpers";
-import { WellnessEntry, WellnessGoal } from "../types/wellness";
+import { WellnessMetricCard } from './wellness/WellnessMetricCard'
+import { TodayActivities } from './wellness/TodayActivities'
+import { WellnessGoalCard } from './wellness/WellnessGoalCard'
+import {
+  WELLNESS_METRICS,
+  WEEKLY_PROGRESS_DATA,
+  MOCK_WELLNESS_GOALS,
+} from '../constants/wellness'
+import {
+  getWellnessScore,
+  getMetricProgress,
+  getStreakCount,
+} from '../utils/wellness-helpers'
+import { WellnessEntry, WellnessGoal } from '../types/wellness'
 
 interface User {
-  id: string;
-  name: string;
-  wellnessGoals?: WellnessGoal[];
+  id: string
+  name: string
+  wellnessGoals?: WellnessGoal[]
 }
 
 interface WellnessTrackerProps {
-  user: User | null;
-  entries: WellnessEntry[];
-  onAddEntry: (entry: WellnessEntry) => void;
+  user: User | null
+  entries: WellnessEntry[]
+  onAddEntry: (entry: WellnessEntry) => void
 }
 
-export function WellnessTracker({ user, entries, onAddEntry }: WellnessTrackerProps) {
-  const [activeTab, setActiveTab] = useState('overview');
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+export function WellnessTracker({
+  user,
+  entries,
+  onAddEntry,
+}: WellnessTrackerProps) {
+  const [activeTab, setActiveTab] = useState('overview')
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date())
   const [newEntry, setNewEntry] = useState({
     type: 'exercise' as WellnessEntry['type'],
     value: 0,
     duration: 0,
-    notes: ''
-  });
+    notes: '',
+  })
 
-  const wellnessScore = getWellnessScore();
+  const wellnessScore = getWellnessScore()
 
   const handleAddEntry = () => {
-    if (newEntry.value <= 0) return;
+    if (newEntry.value <= 0) return
 
     const entry: WellnessEntry = {
       id: Date.now().toString(),
       date: selectedDate.toISOString().split('T')[0],
       type: newEntry.type,
       value: newEntry.value,
-      unit: WELLNESS_METRICS.find(m => m.id === newEntry.type)?.unit || '',
+      unit: WELLNESS_METRICS.find((m) => m.id === newEntry.type)?.unit || '',
       duration: newEntry.duration || undefined,
-      notes: newEntry.notes || undefined
-    };
+      notes: newEntry.notes || undefined,
+    }
 
-    onAddEntry(entry);
-    setNewEntry({ type: 'exercise', value: 0, duration: 0, notes: '' });
-  };
+    onAddEntry(entry)
+    setNewEntry({ type: 'exercise', value: 0, duration: 0, notes: '' })
+  }
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Wellness Tracker</h1>
-          <p className="text-gray-600 mt-2">Monitor your holistic health and wellness journey</p>
+          <p className="text-gray-600 mt-2">
+            Monitor your holistic health and wellness journey
+          </p>
         </div>
         <div className="flex items-center space-x-3">
           <div className="text-center">
-            <div className="text-2xl font-bold text-green-600">{wellnessScore}</div>
+            <div className="text-2xl font-bold text-green-600">
+              {wellnessScore}
+            </div>
             <div className="text-sm text-gray-600">Wellness Score</div>
           </div>
           <Dialog>
@@ -95,7 +133,12 @@ export function WellnessTracker({ user, entries, onAddEntry }: WellnessTrackerPr
               <div className="space-y-4">
                 <div>
                   <Label>Activity Type</Label>
-                  <Select value={newEntry.type} onValueChange={(value: any) => setNewEntry({...newEntry, type: value})}>
+                  <Select
+                    value={newEntry.type}
+                    onValueChange={(value: any) =>
+                      setNewEntry({ ...newEntry, type: value })
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -108,38 +151,51 @@ export function WellnessTracker({ user, entries, onAddEntry }: WellnessTrackerPr
                     </SelectContent>
                   </Select>
                 </div>
-                
+
                 <div>
                   <Label>Value</Label>
                   <Input
                     type="number"
                     placeholder="Enter value"
                     value={newEntry.value || ''}
-                    onChange={(e) => setNewEntry({...newEntry, value: Number(e.target.value)})}
+                    onChange={(e) =>
+                      setNewEntry({
+                        ...newEntry,
+                        value: Number(e.target.value),
+                      })
+                    }
                   />
                 </div>
-                
-                {(newEntry.type === 'exercise' || newEntry.type === 'meditation') && (
+
+                {(newEntry.type === 'exercise' ||
+                  newEntry.type === 'meditation') && (
                   <div>
                     <Label>Duration (minutes)</Label>
                     <Input
                       type="number"
                       placeholder="Enter duration"
                       value={newEntry.duration || ''}
-                      onChange={(e) => setNewEntry({...newEntry, duration: Number(e.target.value)})}
+                      onChange={(e) =>
+                        setNewEntry({
+                          ...newEntry,
+                          duration: Number(e.target.value),
+                        })
+                      }
                     />
                   </div>
                 )}
-                
+
                 <div>
                   <Label>Notes (optional)</Label>
                   <Textarea
                     placeholder="Add any notes about this activity..."
                     value={newEntry.notes}
-                    onChange={(e) => setNewEntry({...newEntry, notes: e.target.value})}
+                    onChange={(e) =>
+                      setNewEntry({ ...newEntry, notes: e.target.value })
+                    }
                   />
                 </div>
-                
+
                 <Button onClick={handleAddEntry} className="w-full">
                   Log Activity
                 </Button>
@@ -169,7 +225,9 @@ export function WellnessTracker({ user, entries, onAddEntry }: WellnessTrackerPr
             <Card>
               <CardHeader>
                 <CardTitle>Weekly Progress</CardTitle>
-                <CardDescription>Your wellness activities this week</CardDescription>
+                <CardDescription>
+                  Your wellness activities this week
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
@@ -219,9 +277,9 @@ export function WellnessTracker({ user, entries, onAddEntry }: WellnessTrackerPr
         <TabsContent value="metrics" className="space-y-6">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {WELLNESS_METRICS.map((metric) => {
-              const Icon = metric.icon;
-              const progress = getMetricProgress(metric.id);
-              
+              const Icon = metric.icon
+              const progress = getMetricProgress(metric.id)
+
               return (
                 <Card key={metric.id}>
                   <CardHeader>
@@ -239,11 +297,15 @@ export function WellnessTracker({ user, entries, onAddEntry }: WellnessTrackerPr
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-600">Current</span>
-                        <span className="font-bold">{metric.current} {metric.unit}</span>
+                        <span className="font-bold">
+                          {metric.current} {metric.unit}
+                        </span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-600">Target</span>
-                        <span className="font-bold">{metric.target} {metric.unit}</span>
+                        <span className="font-bold">
+                          {metric.target} {metric.unit}
+                        </span>
                       </div>
                       <div className="space-y-2">
                         <div className="flex items-center justify-between text-sm">
@@ -262,7 +324,7 @@ export function WellnessTracker({ user, entries, onAddEntry }: WellnessTrackerPr
                     </div>
                   </CardContent>
                 </Card>
-              );
+              )
             })}
           </div>
         </TabsContent>
@@ -275,7 +337,7 @@ export function WellnessTracker({ user, entries, onAddEntry }: WellnessTrackerPr
               Create New Goal
             </Button>
           </div>
-          
+
           <div className="grid md:grid-cols-2 gap-6">
             {MOCK_WELLNESS_GOALS.map((goal) => (
               <WellnessGoalCard key={goal.id} goal={goal} />
@@ -288,7 +350,9 @@ export function WellnessTracker({ user, entries, onAddEntry }: WellnessTrackerPr
             <Card>
               <CardHeader>
                 <CardTitle>30-Day Trend</CardTitle>
-                <CardDescription>Your wellness metrics over the last month</CardDescription>
+                <CardDescription>
+                  Your wellness metrics over the last month
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
@@ -297,9 +361,24 @@ export function WellnessTracker({ user, entries, onAddEntry }: WellnessTrackerPr
                     <XAxis dataKey="day" />
                     <YAxis />
                     <Tooltip />
-                    <Line type="monotone" dataKey="exercise" stroke="#3B82F6" strokeWidth={2} />
-                    <Line type="monotone" dataKey="sleep" stroke="#8B5CF6" strokeWidth={2} />
-                    <Line type="monotone" dataKey="meditation" stroke="#10B981" strokeWidth={2} />
+                    <Line
+                      type="monotone"
+                      dataKey="exercise"
+                      stroke="#3B82F6"
+                      strokeWidth={2}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="sleep"
+                      stroke="#8B5CF6"
+                      strokeWidth={2}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="meditation"
+                      stroke="#10B981"
+                      strokeWidth={2}
+                    />
                   </LineChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -317,18 +396,28 @@ export function WellnessTracker({ user, entries, onAddEntry }: WellnessTrackerPr
                       <Brain className="w-4 h-4" />
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-medium text-green-800">Meditation Improving</h4>
-                      <p className="text-sm text-green-700">Your meditation consistency has increased by 40% this month</p>
+                      <h4 className="font-medium text-green-800">
+                        Meditation Improving
+                      </h4>
+                      <p className="text-sm text-green-700">
+                        Your meditation consistency has increased by 40% this
+                        month
+                      </p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center space-x-3 p-3 rounded-lg bg-blue-50 border border-blue-200">
                     <div className="p-2 rounded-full bg-blue-100 text-blue-600">
                       <Award className="w-4 h-4" />
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-medium text-blue-800">Exercise Goal Met</h4>
-                      <p className="text-sm text-blue-700">You've exceeded your weekly exercise target for 3 weeks running</p>
+                      <h4 className="font-medium text-blue-800">
+                        Exercise Goal Met
+                      </h4>
+                      <p className="text-sm text-blue-700">
+                        You've exceeded your weekly exercise target for 3 weeks
+                        running
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -341,23 +430,41 @@ export function WellnessTracker({ user, entries, onAddEntry }: WellnessTrackerPr
           <Card>
             <CardHeader>
               <CardTitle>AI-Powered Insights</CardTitle>
-              <CardDescription>Personalized recommendations based on your wellness data</CardDescription>
+              <CardDescription>
+                Personalized recommendations based on your wellness data
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="p-4 rounded-lg bg-purple-50 border border-purple-200">
-                  <h4 className="font-medium text-purple-800 mb-2">Sleep Quality Impact</h4>
-                  <p className="text-sm text-purple-700">Your exercise performance is 25% better on days when you sleep 8+ hours. Consider maintaining a consistent bedtime routine.</p>
+                  <h4 className="font-medium text-purple-800 mb-2">
+                    Sleep Quality Impact
+                  </h4>
+                  <p className="text-sm text-purple-700">
+                    Your exercise performance is 25% better on days when you
+                    sleep 8+ hours. Consider maintaining a consistent bedtime
+                    routine.
+                  </p>
                 </div>
-                
+
                 <div className="p-4 rounded-lg bg-orange-50 border border-orange-200">
-                  <h4 className="font-medium text-orange-800 mb-2">Hydration Reminder</h4>
-                  <p className="text-sm text-orange-700">You tend to drink less water on busy workdays. Setting hourly reminders could help you reach your daily goal.</p>
+                  <h4 className="font-medium text-orange-800 mb-2">
+                    Hydration Reminder
+                  </h4>
+                  <p className="text-sm text-orange-700">
+                    You tend to drink less water on busy workdays. Setting
+                    hourly reminders could help you reach your daily goal.
+                  </p>
                 </div>
-                
+
                 <div className="p-4 rounded-lg bg-green-50 border border-green-200">
-                  <h4 className="font-medium text-green-800 mb-2">Meditation Benefits</h4>
-                  <p className="text-sm text-green-700">Your stress levels are 30% lower on days you meditate. Consider extending your morning session by 5 minutes.</p>
+                  <h4 className="font-medium text-green-800 mb-2">
+                    Meditation Benefits
+                  </h4>
+                  <p className="text-sm text-green-700">
+                    Your stress levels are 30% lower on days you meditate.
+                    Consider extending your morning session by 5 minutes.
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -365,5 +472,5 @@ export function WellnessTracker({ user, entries, onAddEntry }: WellnessTrackerPr
         </TabsContent>
       </Tabs>
     </div>
-  );
+  )
 }

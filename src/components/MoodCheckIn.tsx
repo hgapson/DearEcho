@@ -1,105 +1,97 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import { Button } from "./ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Textarea } from "./ui/textarea";
-import { Badge } from "./ui/badge";
-import { Slider } from "./ui/slider";
-import { 
-  Heart, 
-  Calendar, 
+import { useState } from 'react'
+import { Button } from './ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
+import { Textarea } from './ui/textarea'
+// import { Badge } from './ui/badge'
+import { Slider } from './ui/slider'
+import {
+  Heart,
+  Calendar,
   Save,
   Sparkles,
   TrendingUp,
   Brain,
   Smile,
-  Coffee,
   Moon,
-  Sun
-} from "lucide-react";
-import { toast } from "sonner@2.0.3";
-import { MoodEntry, User } from "../App";
+  Sun,
+} from 'lucide-react'
+import { toast } from 'sonner'
+import type { MoodEntry, User } from '../types'   // 👈 fixed
 
 interface MoodCheckInProps {
-  user: User | null;
-  onMoodEntry: (entry: MoodEntry) => void;
+  user: User | null
+  onMoodEntry: (entry: MoodEntry) => void
 }
 
 export function MoodCheckIn({ user, onMoodEntry }: MoodCheckInProps) {
-  const [moodValue, setMoodValue] = useState([5]);
-  const [selectedEmotion, setSelectedEmotion] = useState<string>("");
-  const [note, setNote] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [moodValue, setMoodValue] = useState<number[]>([5])
+  const [selectedEmotion, setSelectedEmotion] = useState<string>('')
+  const [note, setNote] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const emotions = [
-    { id: "happy", label: "Happy", emoji: "😊", color: "bg-yellow-100 text-yellow-700" },
-    { id: "excited", label: "Excited", emoji: "🤩", color: "bg-orange-100 text-orange-700" },
-    { id: "grateful", label: "Grateful", emoji: "🙏", color: "bg-green-100 text-green-700" },
-    { id: "peaceful", label: "Peaceful", emoji: "😌", color: "bg-blue-100 text-blue-700" },
-    { id: "content", label: "Content", emoji: "😊", color: "bg-teal-100 text-teal-700" },
-    { id: "neutral", label: "Neutral", emoji: "😐", color: "bg-gray-100 text-gray-700" },
-    { id: "tired", label: "Tired", emoji: "😴", color: "bg-purple-100 text-purple-700" },
-    { id: "stressed", label: "Stressed", emoji: "😰", color: "bg-red-100 text-red-700" },
-    { id: "anxious", label: "Anxious", emoji: "😟", color: "bg-orange-100 text-orange-700" },
-    { id: "sad", label: "Sad", emoji: "😢", color: "bg-blue-100 text-blue-700" },
-    { id: "frustrated", label: "Frustrated", emoji: "😤", color: "bg-red-100 text-red-700" },
-    { id: "lonely", label: "Lonely", emoji: "😔", color: "bg-gray-100 text-gray-700" }
-  ];
+    { id: 'happy', label: 'Happy', emoji: '😊', color: 'bg-yellow-100 text-yellow-700' },
+    { id: 'excited', label: 'Excited', emoji: '🤩', color: 'bg-orange-100 text-orange-700' },
+    { id: 'grateful', label: 'Grateful', emoji: '🙏', color: 'bg-green-100 text-green-700' },
+    { id: 'peaceful', label: 'Peaceful', emoji: '😌', color: 'bg-blue-100 text-blue-700' },
+    { id: 'content', label: 'Content', emoji: '😊', color: 'bg-teal-100 text-teal-700' },
+    { id: 'neutral', label: 'Neutral', emoji: '😐', color: 'bg-gray-100 text-gray-700' },
+    { id: 'tired', label: 'Tired', emoji: '😴', color: 'bg-purple-100 text-purple-700' },
+    { id: 'stressed', label: 'Stressed', emoji: '😰', color: 'bg-red-100 text-red-700' },
+    { id: 'anxious', label: 'Anxious', emoji: '😟', color: 'bg-orange-100 text-orange-700' },
+    { id: 'sad', label: 'Sad', emoji: '😢', color: 'bg-blue-100 text-blue-700' },
+    { id: 'frustrated', label: 'Frustrated', emoji: '😤', color: 'bg-red-100 text-red-700' },
+    { id: 'lonely', label: 'Lonely', emoji: '😔', color: 'bg-gray-100 text-gray-700' },
+  ]
 
-  const getMoodDescription = (value: number) => {
-    if (value >= 9) return "Absolutely wonderful! ✨";
-    if (value >= 7) return "Really good! 😊";
-    if (value >= 5) return "Pretty okay 👍";
-    if (value >= 3) return "Could be better 😕";
-    return "Having a tough time 💙";
-  };
+  const getMoodDescription = (v: number) =>
+    v >= 9 ? 'Absolutely wonderful! ✨'
+    : v >= 7 ? 'Really good! 😊'
+    : v >= 5 ? 'Pretty okay 👍'
+    : v >= 3 ? 'Could be better 😕'
+    : 'Having a tough time 💙'
 
-  const getMoodColor = (value: number) => {
-    if (value >= 8) return "text-green-600";
-    if (value >= 6) return "text-blue-600";
-    if (value >= 4) return "text-yellow-600";
-    return "text-red-600";
-  };
+  const getMoodColor = (v: number) =>
+    v >= 8 ? 'text-green-600'
+    : v >= 6 ? 'text-blue-600'
+    : v >= 4 ? 'text-yellow-600'
+    : 'text-red-600'
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (!selectedEmotion) {
-      toast.error("Please select how you're feeling");
-      return;
+      toast.error("Please select how you're feeling")
+      return
     }
+    setIsSubmitting(true)
 
-    setIsSubmitting(true);
-
-    // Create new mood entry
     const newEntry: MoodEntry = {
       id: Date.now().toString(),
       date: new Date().toISOString(),
       mood: moodValue[0],
       emotion: selectedEmotion,
-      note: note.trim() || undefined
-    };
+      note: note.trim() || undefined,
+    }
 
-    // Simulate API call
     setTimeout(() => {
-      onMoodEntry(newEntry);
-      toast.success("Mood tracked! Thank you for checking in with yourself 💙");
-      
-      // Reset form
-      setMoodValue([5]);
-      setSelectedEmotion("");
-      setNote("");
-      setIsSubmitting(false);
-    }, 1000);
-  };
+      onMoodEntry(newEntry)
+      toast.success('Mood tracked! Thank you for checking in with yourself 💙')
+      setMoodValue([5])
+      setSelectedEmotion('')
+      setNote('')
+      setIsSubmitting(false)
+    }, 1000)
+  }
 
   const getCurrentTime = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return { greeting: "Good Morning", icon: Sun };
-    if (hour < 17) return { greeting: "Good Afternoon", icon: Sun };
-    return { greeting: "Good Evening", icon: Moon };
-  };
+    const hour = new Date().getHours()
+    if (hour < 12) return { greeting: 'Good Morning', icon: Sun }
+    if (hour < 17) return { greeting: 'Good Afternoon', icon: Sun }
+    return { greeting: 'Good Evening', icon: Moon }
+  }
 
-  const { greeting, icon: TimeIcon } = getCurrentTime();
+  const { greeting, icon: TimeIcon } = getCurrentTime()
 
   return (
     <div className="min-h-screen pt-6 pb-20 px-4 bg-gradient-to-br from-blue-50/30 via-purple-50/20 to-pink-50/30">
@@ -166,11 +158,11 @@ export function MoodCheckIn({ user, onMoodEntry }: MoodCheckInProps) {
               {emotions.map((emotion) => (
                 <Button
                   key={emotion.id}
-                  variant={selectedEmotion === emotion.id ? "default" : "outline"}
+                  variant={selectedEmotion === emotion.id ? 'default' : 'outline'}
                   onClick={() => setSelectedEmotion(emotion.id)}
                   className={`h-auto p-4 flex flex-col items-center space-y-2 transition-all duration-200 ${
-                    selectedEmotion === emotion.id 
-                      ? `${emotion.color} border-2 border-current shadow-lg transform scale-105` 
+                    selectedEmotion === emotion.id
+                      ? `${emotion.color} border-2 border-current shadow-lg transform scale-105`
                       : 'hover:scale-105 border-2 border-gray-200 hover:border-gray-300'
                   }`}
                 >
@@ -214,7 +206,7 @@ export function MoodCheckIn({ user, onMoodEntry }: MoodCheckInProps) {
           >
             {isSubmitting ? (
               <div className="flex items-center space-x-2">
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 <span>Saving...</span>
               </div>
             ) : (
@@ -245,7 +237,7 @@ export function MoodCheckIn({ user, onMoodEntry }: MoodCheckInProps) {
               <p className="text-2xl font-bold text-gray-800">5</p>
             </CardContent>
           </Card>
-          
+
           <Card className="shadow-lg border-0 bg-white/60 backdrop-blur-sm">
             <CardContent className="p-4 text-center">
               <Smile className="w-6 h-6 text-green-500 mx-auto mb-2" />
@@ -256,5 +248,5 @@ export function MoodCheckIn({ user, onMoodEntry }: MoodCheckInProps) {
         </div>
       </div>
     </div>
-  );
+  )
 }
