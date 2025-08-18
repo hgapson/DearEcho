@@ -1,21 +1,26 @@
+// src/App.tsx
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { Routes, Route } from 'react-router-dom'
+import { Layout } from './components/Layout'
+import ProtectedRoute from './components/ProtectedRoute'
 import { AuthPage } from './components/AuthPage'
 import { WelcomeScreen } from './components/WelcomeScreen'
 import { MoodCheckIn } from './components/MoodCheckIn'
 import { LetterWriter } from './components/LetterWriter'
 import { GuidedJournal } from './components/GuidedJournal'
-
-// ⬇️ Import types with `import type`
-import type { AppPage, User, MoodEntry, Letter } from './types'
+import type {
+  User as UserType,
+  MoodEntry as MoodEntryType,
+  Letter as LetterType,
+} from './types'                               // ✅ type-only + aliases
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [user, setUser] = useState<User | null>(null)
-  const [currentPage, setCurrentPage] = useState<AppPage>('welcome')
-  const [moodEntries, setMoodEntries] = useState<MoodEntry[]>([])
-  const [letters, setLetters] = useState<Letter[]>([])
+  const [user, setUser] = useState<UserType | null>(null)
+  const [moodEntries, setMoodEntries] = useState<MoodEntryType[]>([])
+  const [letters, setLetters] = useState<LetterType[]>([])
   const [darkMode, setDarkMode] = useState(false)
 
   useEffect(() => {
@@ -28,51 +33,63 @@ export default function App() {
     document.documentElement.classList.toggle('dark', darkMode)
   }, [darkMode])
 
-  const handleLogin = (userData: User) => {
+  const handleLogin = (userData: UserType) => {
     setUser(userData)
     setIsAuthenticated(true)
-    setCurrentPage('welcome')
   }
 
-  const protectedPages: AppPage[] = ['mood', 'letter', 'journal']
-  if (protectedPages.includes(currentPage) && !isAuthenticated) {
-    return <AuthPage onLogin={handleLogin} />
-  }
-
-  const renderCurrentPage = () => {
-    switch (currentPage) {
-      case 'welcome':
-        return <WelcomeScreen user={user} onNavigate={setCurrentPage} />
-      case 'mood':
-        return (
-          <MoodCheckIn
-            user={user}
-            onMoodEntry={(entry) => setMoodEntries([...moodEntries, entry])}
-          />
-        )
-      case 'letter':
-        return (
-          <LetterWriter
-            user={user}
-            onSaveLetter={(letter) => setLetters([...letters, letter])}
-          />
-        )
-      case 'journal':
-        return <GuidedJournal user={user} />
-      case 'auth':
-        return <AuthPage onLogin={handleLogin} />
-      default:
-        return <WelcomeScreen user={user} onNavigate={setCurrentPage} />
-    }
+  const handleLogout = () => {
+    setUser(null)
+    setIsAuthenticated(false)
   }
 
   return (
-    <div
-      className={`min-h-screen bg-background transition-colors duration-300 ${
-        darkMode ? 'dark' : ''
-      }`}
-    >
-      <main className="pb-20 pt-20">{renderCurrentPage()}</main>
-    </div>
+    <Routes>
+      <Route
+        element={
+          <Layout
+            isAuthenticated={isAuthenticated}
+            user={user}
+            onLogout={handleLogout}
+            darkMode={darkMode}
+            onToggleDarkMode={() => setDarkMode((v) => !v)}
+          />
+        }
+      >
+        {/* Public */}
+        <Route index element={<WelcomeScreen user={user} />} />
+        <Route path="/auth" element={<AuthPage onLogin={handleLogin} />} />
+
+        {/* Protected */}
+        <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
+          <Route
+            path="/mood"
+            element={
+              <MoodCheckIn
+                user={user}
+                onMoodEntry={(entry) =>
+                  setMoodEntries((prev) => [...prev, entry]) // ✅ functional update with 'prev'
+                }
+              />
+            }
+          />
+          <Route
+            path="/letter"
+            element={
+              <LetterWriter
+                user={user}
+                onSaveLetter={(letter) =>
+                  setLetters((prev) => [...prev, letter])    // ✅ same pattern
+                }
+              />
+            }
+          />
+          <Route path="/journal" element={<GuidedJournal user={user} />} />
+        </Route>
+
+        {/* 404 */}
+        <Route path="*" element={<div className="p-6">Not Found</div>} />
+      </Route>
+    </Routes>
   )
 }

@@ -24,7 +24,7 @@ export interface WellnessEntry {
 export interface WellnessMetric {
   id: string;
   name: string;
-  icon: any;
+  icon: unknown;
   color: string;
   unit: string;
   target: number;
