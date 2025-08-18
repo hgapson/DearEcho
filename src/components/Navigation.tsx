@@ -6,7 +6,7 @@ import { Button } from './ui/button'
 import { Heart, Menu, X, LogIn, LogOut, Moon, Sun } from 'lucide-react'
 import type { User } from '../types'
 
-function cn(...xs: Array<string | false | undefined | null>) {
+function cn(...xs: Array<string | false | null | undefined>) {
   return xs.filter(Boolean).join(' ')
 }
 
@@ -25,7 +25,13 @@ interface Props {
   darkMode?: boolean
 }
 
-export function Navigation({ isAuthenticated, user, onLogout, onToggleDarkMode, darkMode }: Props) {
+export function Navigation({
+  isAuthenticated,
+  user,
+  onLogout,
+  onToggleDarkMode,
+  darkMode,
+}: Props) {
   const [open, setOpen] = useState(false)
 
   return (
@@ -60,14 +66,21 @@ export function Navigation({ isAuthenticated, user, onLogout, onToggleDarkMode, 
           {/* Actions */}
           <div className="hidden md:flex items-center gap-2">
             {onToggleDarkMode && (
-              <Button variant="ghost" size="icon" onClick={onToggleDarkMode} aria-label="Toggle theme">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onToggleDarkMode}
+                aria-label="Toggle theme"
+              >
                 {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
               </Button>
             )}
 
             {isAuthenticated ? (
               <>
-                <span className="text-sm text-muted-foreground hidden lg:inline">{user?.name}</span>
+                <span className="text-sm text-muted-foreground hidden lg:inline">
+                  {user?.name}
+                </span>
                 <Button variant="outline" onClick={onLogout}>
                   <LogOut className="h-4 w-4 mr-2" />
                   Logout
@@ -84,7 +97,12 @@ export function Navigation({ isAuthenticated, user, onLogout, onToggleDarkMode, 
           </div>
 
           {/* Mobile toggle */}
-          <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setOpen((v) => !v)}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
+            onClick={() => setOpen((v) => !v)}
+          >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
         </div>
@@ -111,13 +129,35 @@ export function Navigation({ isAuthenticated, user, onLogout, onToggleDarkMode, 
 
               <div className="mt-2 flex items-center gap-2 px-3">
                 {onToggleDarkMode && (
-                  <Button variant="outline" className="flex-1" onClick={() => { onToggleDarkMode(); setOpen(false) }}>
-                    {darkMode ? <><Sun className="h-4 w-4 mr-2" /> Light</> : <><Moon className="h-4 w-4 mr-2" /> Dark</>}
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => {
+                      onToggleDarkMode()
+                      setOpen(false)
+                    }}
+                  >
+                    {darkMode ? (
+                      <>
+                        <Sun className="h-4 w-4 mr-2" /> Light
+                      </>
+                    ) : (
+                      <>
+                        <Moon className="h-4 w-4 mr-2" /> Dark
+                      </>
+                    )}
                   </Button>
                 )}
 
                 {isAuthenticated ? (
-                  <Button variant="outline" className="flex-1" onClick={() => { onLogout?.(); setOpen(false) }}>
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => {
+                      onLogout?.()
+                      setOpen(false)
+                    }}
+                  >
                     <LogOut className="h-4 w-4 mr-2" />
                     Logout
                   </Button>

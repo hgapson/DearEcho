@@ -1,4 +1,3 @@
-// src/App.tsx
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -10,17 +9,13 @@ import { WelcomeScreen } from './components/WelcomeScreen'
 import { MoodCheckIn } from './components/MoodCheckIn'
 import { LetterWriter } from './components/LetterWriter'
 import { GuidedJournal } from './components/GuidedJournal'
-import type {
-  User as UserType,
-  MoodEntry as MoodEntryType,
-  Letter as LetterType,
-} from './types'                               // ✅ type-only + aliases
+import type { User, MoodEntry, Letter, AppPage } from './types'
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [user, setUser] = useState<UserType | null>(null)
-  const [moodEntries, setMoodEntries] = useState<MoodEntryType[]>([])
-  const [letters, setLetters] = useState<LetterType[]>([])
+  const [user, setUser] = useState<User | null>(null)
+  const [moodEntries, setMoodEntries] = useState<MoodEntry[]>([])
+  const [letters, setLetters] = useState<Letter[]>([])
   const [darkMode, setDarkMode] = useState(false)
 
   useEffect(() => {
@@ -33,7 +28,7 @@ export default function App() {
     document.documentElement.classList.toggle('dark', darkMode)
   }, [darkMode])
 
-  const handleLogin = (userData: UserType) => {
+  const handleLogin = (userData: User) => {
     setUser(userData)
     setIsAuthenticated(true)
   }
@@ -45,6 +40,7 @@ export default function App() {
 
   return (
     <Routes>
+      {/* Layout wraps all pages */}
       <Route
         element={
           <Layout
@@ -57,19 +53,19 @@ export default function App() {
         }
       >
         {/* Public */}
-        <Route index element={<WelcomeScreen user={user} />} />
+        <Route index element={<WelcomeScreen user={user} onNavigate={function (page: AppPage): void {
+          throw new Error('Function not implemented.')
+        } } />} />
         <Route path="/auth" element={<AuthPage onLogin={handleLogin} />} />
 
-        {/* Protected */}
+        {/* Protected group */}
         <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
           <Route
             path="/mood"
             element={
               <MoodCheckIn
                 user={user}
-                onMoodEntry={(entry) =>
-                  setMoodEntries((prev) => [...prev, entry]) // ✅ functional update with 'prev'
-                }
+                onMoodEntry={(entry) => setMoodEntries((p) => [...p, entry])}
               />
             }
           />
@@ -78,9 +74,7 @@ export default function App() {
             element={
               <LetterWriter
                 user={user}
-                onSaveLetter={(letter) =>
-                  setLetters((prev) => [...prev, letter])    // ✅ same pattern
-                }
+                onSaveLetter={(letter) => setLetters((p) => [...p, letter])}
               />
             }
           />
