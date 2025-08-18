@@ -11,7 +11,7 @@ import {
   LogIn,
   ArrowRight,
 } from 'lucide-react'
-import { AppPage, User } from '../App'
+import type { AppPage, User } from '../types';
 
 interface WelcomeScreenProps {
   user: User | null

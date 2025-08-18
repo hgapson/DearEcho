@@ -1,4 +1,4 @@
-export type AppPage = "welcome" | "mood" | "letter" | "journal" | "auth";
+export type AppPage = "welcome" | "mood" | "letter" | "journal" | "auth" | "draw" | "music";
 export type MoodType = 'happy' | 'sad' | 'angry' | 'anxious' | 'lonely';
 
 export type RecipientType = 'younger' | 'future' | 'present';

@@ -10,7 +10,7 @@ import { Separator } from './ui/separator'
 import {
   Mail,
   Lock,
-  User as UserIcon, // ⬅️ rename icon to avoid clash
+  User as UserIcon, 
   Eye,
   EyeOff,
   Heart,
@@ -18,12 +18,10 @@ import {
   Shield,
 } from 'lucide-react'
 import { toast } from 'sonner'
-
-// ⬅️ import types only, from the correct file
 import type { User as AppUser } from '../types'
 
 interface AuthPageProps {
-  onLogin: (user: AppUser) => void // ⬅️ use the actual type
+  onLogin: (user: AppUser) => void 
 }
 
 export function AuthPage({ onLogin }: AuthPageProps) {

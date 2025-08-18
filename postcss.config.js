@@ -3,10 +3,5 @@ export default {
     "@tailwindcss/postcss": {},
     autoprefixer: {},
   },
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-
 };
 
