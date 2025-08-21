@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth"
-import { auth } from "../../firebase"
+import {useAth} from "../context/authContext/AuthContext"
+import { auth } from "../../"
 import { Button } from '../ui/button'
 import { Input } from "../ui/input"
 import { Label } from "../ui/label"
