@@ -1,20 +1,20 @@
-'use client'
+'use client';
 
-import type { ReactElement } from 'react'
-import { Navigate, Outlet, useLocation } from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom';
+import type { PropsWithChildren } from 'react';
 
 export default function RedirectIfAuthed({
   isAuthenticated,
   to = '/',
   children,
-}: {
-  isAuthenticated: boolean
-  to?: string
-  children?: ReactElement
-}) {
-  const location = useLocation()
+}: PropsWithChildren<{
+  isAuthenticated: boolean;
+  to?: string;
+}>) {
+  const location = useLocation();
   if (isAuthenticated) {
-    return <Navigate to={to} replace state={{ from: location }} />
+    // If already logged in, bounce away from /auth
+    return <Navigate to={to} replace state={{ from: location }} />;
   }
-  return children ?? <Outlet />
+  return <>{children}</>;
 }

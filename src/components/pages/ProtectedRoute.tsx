@@ -1,17 +1,17 @@
-'use client'
+'use client';
 
-import { Navigate, Outlet, useLocation } from 'react-router-dom'
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 
 export default function ProtectedRoute({
   isAuthenticated,
   redirectTo = '/auth',
 }: {
-  isAuthenticated: boolean
-  redirectTo?: string
+  isAuthenticated: boolean;
+  redirectTo?: string;
 }) {
-  const location = useLocation()
+  const location = useLocation();
   if (!isAuthenticated) {
-    return <Navigate to={redirectTo} replace state={{ from: location }} />
+    return <Navigate to={redirectTo} replace state={{ from: location }} />;
   }
-  return <Outlet />
+  return <Outlet />;
 }
