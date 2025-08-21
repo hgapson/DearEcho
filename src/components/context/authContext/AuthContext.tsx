@@ -1,39 +1,27 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { auth } from '../../../firebase'
+// src/components/context/AuthContext.tsx
+'use client'
 
+import { createContext, useContext, useEffect, useState } from "react"
+import { onAuthStateChanged, type User as FirebaseUser } from "firebase/auth"
+import { auth } from "../../../firebase"
 
-const AuthContext = React.createContext()
+type AuthCtx = { user: FirebaseUser | null; loading: boolean }
+const Ctx = createContext<AuthCtx>({ user: null, loading: true })
 
-export function useAuth() {
-  return useContext(AuthContext)
-}
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<FirebaseUser | null>(null)
+  const [loading, setLoading] = useState(true)
 
-export function AuthProvider({ children }) {
-  const [currentUser, setCurrentUser] = React.useState()
-
-  function signup(email, password) {
-   return auth.createUserWithEmailAndPassword(email, password)
-  }
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(user => {
-      setCurrentUser(user)
+    const unsub = onAuthStateChanged(auth, (u) => {
+      setUser(u)
+      setLoading(false)
     })
-    return unsubscribe
+    return unsub
   }, [])
 
-  auth.onAuthStateChanged(user => {
-    setCurrentUser(user)
-  })
-
-  const value = {
-        currentUser,
-        signup,
-
-  }
-
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  )
+  return <Ctx.Provider value={{ user, loading }}>{children}</Ctx.Provider>
 }
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const useAuth = () => useContext(Ctx)
