@@ -5,7 +5,7 @@ import {
   Utensils,
   Brain
 } from "lucide-react";
-import { WellnessMetric, WellnessEntry, WellnessGoal, WeeklyProgressData } from "../types/wellness";
+import type { WellnessMetric, WellnessEntry, WellnessGoal, WeeklyProgressData } from "../types/wellness";
 
 export const WELLNESS_METRICS: WellnessMetric[] = [
   {

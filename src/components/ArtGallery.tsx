@@ -21,7 +21,8 @@ import {
   List,
   Archive,
 } from 'lucide-react'
-import { Drawing, Letter, User } from '../App'
+import Drawing from '../App'
+import type { Letter, User } from '../App'
 
 interface ArtGalleryProps {
   user: User | null

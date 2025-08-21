@@ -1,5 +1,5 @@
 import { WELLNESS_METRICS, MOCK_WELLNESS_ENTRIES } from "../constants/wellness";
-import { WellnessEntry } from "../types/wellness";
+import type { WellnessEntry } from "../types/wellness";
 
 export const getMetricProgress = (metricId: string): number => {
   const metric = WELLNESS_METRICS.find(m => m.id === metricId);
@@ -7,7 +7,7 @@ export const getMetricProgress = (metricId: string): number => {
   return Math.min((metric.current / metric.target) * 100, 100);
 };
 
-export const getStreakCount = (type: WellnessEntry['type']): number => {
+export const getStreakCount = (): number => {
   // Mock streak calculation - in real app, this would calculate actual streaks
   return Math.floor(Math.random() * 14) + 1;
 };

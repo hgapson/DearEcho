@@ -1,28 +1,27 @@
-// src/components/Layout.tsx
 'use client'
 
 import { Outlet } from 'react-router-dom'
 import { Navigation } from './Navigation'
-import { Footer } from './Footer'            // ✅ keep this import
+import { Footer } from './Footer'
 import type { User } from '../types'
 
-interface Props {
+type Props = {
   isAuthenticated: boolean
   user: User | null
-  onLogout: () => void
   darkMode: boolean
   onToggleDarkMode: () => void
+  onLogout: () => void
 }
 
 export function Layout({
   isAuthenticated,
   user,
-  onLogout,
   darkMode,
   onToggleDarkMode,
+  onLogout,
 }: Props) {
   return (
-    <div className={`min-h-screen bg-background ${darkMode ? 'dark' : ''}`}>
+    <div className={`flex min-h-screen flex-col ${darkMode ? 'dark' : ''}`}>
       <Navigation
         isAuthenticated={isAuthenticated}
         user={user}
@@ -30,10 +29,10 @@ export function Layout({
         darkMode={darkMode}
         onToggleDarkMode={onToggleDarkMode}
       />
-      <main className="pt-16 pb-8">
+      <main className="flex-1 pt-16 pb-20">
         <Outlet />
       </main>
-      <Footer />                               {/* ✅ use the imported Footer */}
+      <Footer />
     </div>
   )
 }
