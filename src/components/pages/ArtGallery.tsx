@@ -1,11 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { Button } from './ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
-import { Badge } from './ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs'
-import { Input } from './ui/input'
+import { Button } from '../ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
+import { Badge } from '../ui/badge'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
+import { Input } from '../ui/input'
 import {
   Image,
   PenTool,
@@ -21,8 +21,8 @@ import {
   List,
   Archive,
 } from 'lucide-react'
-import Drawing from '../App'
-import type { Letter, User } from '../App'
+import Drawing from '../../App'
+import type { Letter, User } from '../../App'
 
 interface ArtGalleryProps {
   user: User | null

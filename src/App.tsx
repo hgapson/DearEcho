@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { BrowserRouter } from 'react-router-dom'
 import AppRoutes from './AppRoutes'
 
 import type { User, MoodEntry, Letter } from './types'
@@ -20,7 +19,6 @@ export default function App() {
     if (savedDark !== null) setDarkMode(JSON.parse(savedDark))
   }, [])
 
-
   useEffect(() => {
     localStorage.setItem('darkMode', JSON.stringify(darkMode))
     document.documentElement.classList.toggle('dark', darkMode)
@@ -37,17 +35,15 @@ export default function App() {
   }
 
   return (
-    <BrowserRouter>
-      <AppRoutes
-        isAuthenticated={isAuthenticated}
-        user={user}
-        darkMode={darkMode}
-        onToggleDarkMode={() => setDarkMode((v) => !v)}
-        onLogout={handleLogout}
-        onLogin={handleLogin}
-        onAddMood={(m) => setMoodEntries((prev) => [...prev, m])}
-        onAddLetter={(l) => setLetters((prev) => [...prev, l])}
-      />
-    </BrowserRouter>
+    <AppRoutes
+      isAuthenticated={isAuthenticated}
+      user={user}
+      darkMode={darkMode}
+      onToggleDarkMode={() => setDarkMode((v) => !v)}
+      onLogout={handleLogout}
+      onLogin={handleLogin}
+      onAddMood={(m) => setMoodEntries((prev) => [...prev, m])}
+      onAddLetter={(l) => setLetters((prev) => [...prev, l])}
+    />
   )
 }

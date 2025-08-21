@@ -2,7 +2,7 @@
 
 import { Outlet } from 'react-router-dom'
 import { Navigation } from './Navigation'
-import { Footer } from './Footer'
+import { Footer } from './pages/Footer'
 import type { User } from '../types'
 
 type Props = {

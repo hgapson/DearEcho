@@ -1,15 +1,15 @@
 'use client'
 
 import { Routes, Route } from 'react-router-dom'
-import ProtectedRoute from './components/ProtectedRoute'
-import RedirectIfAuthed from './components/RedirectIfAuthed'
-import { Layout } from './components/Layout'
+import ProtectedRoute from './components/pages/ProtectedRoute'
+import RedirectIfAuthed from './components/pages/RedirectIfAuthed'
+import { Layout } from './components/pages/Layout'
 
-import { AuthPage } from './components/AuthPage'
-import { WelcomeScreen } from './components/WelcomeScreen'
-import { MoodCheckIn } from './components/MoodCheckIn'
-import { LetterWriter } from './components/LetterWriter'
-import { GuidedJournal } from './components/GuidedJournal'
+import { AuthPage } from './components/pages/AuthPage'
+import { WelcomeScreen } from './components/pages/WelcomeScreen'
+import { MoodCheckIn } from './components/pages/MoodCheckIn'
+import { LetterWriter } from './components/pages/LetterWriter'
+import { GuidedJournal } from './components/pages/GuidedJournal'
 
 import type { User, MoodEntry, Letter } from './types'
 
@@ -48,7 +48,10 @@ export default function AppRoutes({
         }
       >
         {/* Public */}
-        <Route index element={<WelcomeScreen user={user} onNavigate={() => {}} />} />
+        <Route
+          index
+          element={<WelcomeScreen user={user} onNavigate={() => {}} />}
+        />
         <Route
           path="/auth"
           element={

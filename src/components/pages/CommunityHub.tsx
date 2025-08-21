@@ -1,19 +1,19 @@
 'use client'
 
 import { useState } from 'react'
-import { Button } from './ui/button'
+import { Button } from '../ui/button'
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from './ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs'
-import { Input } from './ui/input'
-import { Textarea } from './ui/textarea'
-import { Badge } from './ui/badge'
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
+} from '../ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
+import { Input } from '../ui/input'
+import { Textarea } from '../ui/textarea'
+import { Badge } from '../ui/badge'
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 import {
   Users,
   MessageCircle,
@@ -36,14 +36,14 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from './ui/dialog'
+} from '../ui/dialog'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from './ui/select'
+} from '../ui/select'
 
 interface User {
   id: string
