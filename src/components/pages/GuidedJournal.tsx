@@ -1,10 +1,10 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { Button } from'
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
-import { Textarea } from './ui/textarea'
-import { Badge } from './ui/badge'
+import { Button } from "../ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
+import { Textarea } from '../ui/textarea'
+import { Badge } from '../ui/badge'
 import {
   BookOpen,
   Lightbulb,
@@ -19,7 +19,7 @@ import {
 // at the top with other imports
 import type { LucideIcon } from 'lucide-react'
 import { toast } from 'sonner'
-import type { User } from '../types'
+import type { User } from '../../types'
 
 interface GuidedJournalProps {
   user: User | null

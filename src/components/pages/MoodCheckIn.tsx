@@ -1,11 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { Button } from './ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
-import { Textarea } from './ui/textarea'
+import { Button } from '../ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
+import { Textarea } from '../ui/textarea'
 // import { Badge } from './ui/badge'
-import { Slider } from './ui/slider'
+import { Slider } from '../ui/slider'
 import {
   Heart,
   Calendar,
@@ -18,7 +18,7 @@ import {
   Sun,
 } from 'lucide-react'
 import { toast } from 'sonner'
-import type { MoodEntry, User } from '../types'   // 👈 fixed
+import type { MoodEntry, User } from '../../types'   // 👈 fixed
 
 interface MoodCheckInProps {
   user: User | null

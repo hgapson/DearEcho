@@ -6,7 +6,7 @@ import { Button } from '../ui/button'
 import { Login } from '../Authentication/Login'
 import { Register } from '../Authentication/Register'
 
-export function AuthPage({ onLogin }: { onLogin: (user: any) => void }) {
+export function AuthPage({ onLogin }: { onLogin: (user: unknown) => void }) {
   const handleDemoLogin = () => {
     const demoUser = {
       id: 'demo_user',

@@ -2,8 +2,8 @@
 
 import { Outlet } from 'react-router-dom'
 import { Navigation } from './Navigation'
-import { Footer } from './pages/Footer'
-import type { User } from '../types'
+import { Footer } from './Footer'
+import type { User } from '../../types'
 
 type Props = {
   isAuthenticated: boolean

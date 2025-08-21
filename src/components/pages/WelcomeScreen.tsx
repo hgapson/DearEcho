@@ -1,7 +1,7 @@
 'use client'
 
-import { Button } from './ui/button'
-import { Card, CardContent } from './ui/card'
+import { Button } from '../ui/button'
+import { Card, CardContent } from '../ui/card'
 import {
   Smartphone,
   Heart,
@@ -11,7 +11,7 @@ import {
   LogIn,
   ArrowRight,
 } from 'lucide-react'
-import type { AppPage, User } from '../types';
+import type { AppPage, User } from '../../types';
 
 interface WelcomeScreenProps {
   user: User | null

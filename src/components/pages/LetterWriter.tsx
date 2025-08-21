@@ -1,14 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { Button } from './ui/button'
-import { Card, CardContent } from './ui/card'
-import { Textarea } from './ui/textarea'
+import { Button } from '../ui/button'
+import { Card, CardContent } from '../ui/card'
+import { Textarea } from '../ui/textarea'
 import { ArrowLeft, MoreHorizontal, CheckCircle } from 'lucide-react'
 import { toast } from 'sonner'
 
 // types
-import type { Letter, User as UserType, MoodType } from '../types'
+import type { Letter, User as UserType, MoodType } from '../../types'
 
 interface LetterWriterProps {
   user: UserType | null
